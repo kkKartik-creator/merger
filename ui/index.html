@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiteMerge – PDF & PPT Merger</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="12" y1="18" x2="12" y2="12"></line>
+            <line x1="9" y1="15" x2="15" y2="15"></line>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">LiteMerge</h1>
+          <p class="brand-subtitle">Lightweight PDF & PPT Merger</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- LibreOffice Status Badge -->
+        <div id="loStatusBadge" class="status-badge checking" title="Checking LibreOffice status...">
+          <span class="status-dot"></span>
+          <span id="loStatusText" class="status-text">Checking...</span>
+        </div>
+
+        <!-- Theme Toggle Button -->
+        <button id="themeToggleBtn" class="icon-btn" title="Toggle Light / Dark Theme" aria-label="Toggle theme">
+          <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="app-main">
+      <!-- Upload Drop Zone -->
+      <section id="dropZone" class="dropzone" tabindex="0">
+        <input type="file" id="fileInput" multiple accept=".pdf,.ppt,.pptx" style="display: none;">
+        <div class="dropzone-content">
+          <div class="dropzone-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+          </div>
+          <div class="dropzone-prompt">
+            <span class="primary-text">Drag and drop files here, or</span>
+            <button type="button" id="browseBtn" class="btn btn-secondary btn-sm">Browse Files</button>
+          </div>
+          <div class="dropzone-hint">
+            Supports <span class="format-tag">.PDF</span> <span class="format-tag">.PPT</span> <span class="format-tag">.PPTX</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- File List Section -->
+      <section class="file-list-section">
+        <div class="file-list-header">
+          <div class="section-title">
+            <span>Files to Merge</span>
+            <span id="fileCountBadge" class="count-badge">0</span>
+          </div>
+          <button id="clearAllBtn" class="btn btn-text btn-sm" style="display: none;">Clear All</button>
+        </div>
+
+        <div id="fileListContainer" class="file-list-container">
+          <!-- Empty State -->
+          <div id="emptyState" class="empty-state">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="9" y1="9" x2="15" y2="9"></line>
+              <line x1="9" y1="13" x2="15" y2="13"></line>
+              <line x1="9" y1="17" x2="11" y2="17"></line>
+            </svg>
+            <p>No documents added yet</p>
+            <span class="subtext">Add PDF or presentation files in the order you want them merged.</span>
+          </div>
+
+          <!-- Dynamic File List Items -->
+          <ul id="fileList" class="file-list" style="display: none;"></ul>
+        </div>
+      </section>
+
+      <!-- Output Destination Selection -->
+      <section class="destination-section">
+        <label for="outputPathInput" class="destination-label">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+          </svg>
+          Save Merged PDF To:
+        </label>
+        <div class="destination-input-group">
+          <input type="text" id="outputPathInput" readonly placeholder="Choose destination and filename..." class="form-input">
+          <button id="chooseOutputBtn" class="btn btn-secondary">Select Location</button>
+        </div>
+      </section>
+
+      <!-- Progress Section -->
+      <section id="progressSection" class="progress-section" style="display: none;">
+        <div class="progress-header">
+          <span id="progressStep" class="progress-step-text">Processing...</span>
+          <span id="progressPercent" class="progress-percent">0%</span>
+        </div>
+        <div class="progress-bar-track">
+          <div id="progressBarFill" class="progress-bar-fill" style="width: 0%;"></div>
+        </div>
+      </section>
+
+      <!-- Status Alerts -->
+      <div id="alertSuccess" class="alert alert-success" style="display: none;">
+        <div class="alert-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        </div>
+        <div class="alert-body">
+          <div id="successTitle" class="alert-title">Merge Complete!</div>
+          <div id="successMsg" class="alert-desc">Merged 0 pages into destination.</div>
+        </div>
+        <button type="button" class="alert-close" onclick="this.parentElement.style.display='none';">&times;</button>
+      </div>
+
+      <div id="alertError" class="alert alert-error" style="display: none;">
+        <div class="alert-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <div class="alert-body">
+          <div class="alert-title">Operation Failed</div>
+          <div id="errorMsg" class="alert-desc">An error occurred.</div>
+        </div>
+        <button type="button" class="alert-close" onclick="this.parentElement.style.display='none';">&times;</button>
+      </div>
+    </main>
+
+    <!-- Footer Action -->
+    <footer class="app-footer">
+      <button id="mergeBtn" class="btn btn-primary btn-block btn-lg" disabled>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+        </svg>
+        <span>Merge Files</span>
+      </button>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
